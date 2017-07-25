@@ -125,8 +125,7 @@ def drop_invalid_and_upper_utf8_chars(possibly_invalid_string):
     :return: cleaned string
     :returntype: :class:`unicode`
     '''
-    return re.sub(ur'[^\t\r\n\u0020-\ud7ff\ue000-\ufffd]', u' ',
-                  possibly_invalid_string)
+    return re.sub(ur'[^\t\r\n\u0020-\ud7ff\ue000-\ufffd]', u' ', possibly_invalid_string)
 
 def make_clean_html(raw, stream_item=None):
     '''Get a clean text representation of presumed HTML.
