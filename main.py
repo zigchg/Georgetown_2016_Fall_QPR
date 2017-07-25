@@ -1,5 +1,3 @@
-import importlib
-
 __author__ = 'infosense'
 import sys,json,datetime,os,re,collections
 from datetime import datetime
@@ -432,7 +430,7 @@ def validate(document, parsed_query,restricted): # Need to write
         return False
 
 if __name__ == "__main__":
-    importlib.reload(sys)
+    reload(sys)
     sys.setdefaultencoding("utf-8")
     query_path = "post_point_fact.json"
     answer_path = "answer.json"
