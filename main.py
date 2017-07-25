@@ -42,58 +42,33 @@ def TLD_specific_search(document):
     else:
         return ""
 
-def pipeline(query,restricted=True):
+def pipeline(query,documents,restricted=True):
     """
-    :param query: Dictionary
+    :param query: json object
+    :param documents: json object
     :param restricted: Bool, specify which mode to use for post annotation. if True, all the given conditions have to be satisfied.
     :return:
     """
     answer_dic = []
     parsed_query_dic = search.query_parse(query)
     result = []
-    query_body = search.query_body_build(parsed_query_dic)
-    print(parsed_query_dic)
-    print(query_body)
-    documents = search.elastic_search(query_body)
-    print(len(documents))
+    # query_body = search.query_body_build(parsed_query_dic)
+    # print(parsed_query_dic)
+    # print(query_body)
+    # documents = search.elastic_search(query_body)
+    # print(len(documents))
     annotated_raw_contents = []
     annotated_clean_contents = []
-    #is_fir_annotation = True #Indicator if it is the first time annotation for this query
-    #collection = db[query["id"]]
     if "location" in parsed_query_dic["answer_field"] or "name" in parsed_query_dic["answer_field"]:
-        #if query["id"] not in db.collection_names():
         annotated_raw_contents,annotated_clean_contents = annotator(documents,query["id"])
-        # else:
-        #     is_fir_annotation = False
-    #print(len(annotated_raw_contents),len(annotated_clean_contents))
     for i in range(len(documents)):
         if "location" in parsed_query_dic["answer_field"] or "name" in parsed_query_dic["answer_field"]:
-            #if is_fir_annotation:
-                #annotation = {"_id":documents[i]["_id"],"annotated_raw_content":annotated_raw_contents[i],"annotated_clean_content":annotated_clean_contents[i]}
-                #collection.insert_one(annotation)
             documents[i]["annotated_raw_content"] = annotated_raw_contents[i]
             documents[i]["annotated_clean_content"] = annotated_clean_contents[i]
-            # else:
-            #     try:
-            #         annotation = collection.find_one({"_id":documents[i]["_id"]})
-            #         documents[i]["annotated_raw_content"] = annotation["annotated_raw_content"]
-            #         documents[i]["annotated_clean_content"] = annotation["annotated_clean_content"]
-            #     except:
-            #         print(documents[i]["_id"])
-        # output_filepath = "/Users/infosense/Desktop/test"print
-        # w = open(document_path,"w")
-        # extractions = {}
-        # for func_name,func in extraction.functionDic.items():
-        #     extractions["raw_"+func_name] = func(documents[i],True)
-        #     extractions[func_name] = func(documents[i],False)
-        # documents[i]["indexing"] = extractions
-        # json.dump(documents[i],w)
-        # w.close()
         TLD =  TLD_specific_search(documents[i])
         if TLD:
             documents[i]["TLD"] = TLD
         if validate(documents[i],parsed_query_dic,restricted):
-            # print(documents[i]["_id"])
             answer = answer_extraction(documents[i],parsed_query_dic)
             if answer:
                 dic = {}
@@ -434,11 +409,13 @@ if __name__ == "__main__":
     sys.setdefaultencoding("utf-8")
     query_path = "post_point_fact.json"
     answer_path = "answer.json"
+    doc_path = "documents.json"
+    documents = []
     query_list = search.query_retrival(query_path)
     for query in query_list:
-        ans = pipeline(query)
+        ans = pipeline(query,documents,True)
         if len(ans["answers"]) == 0:
-            ans = pipeline(query,False)
+            ans = pipeline(query,documents,False)
         filepath = "HG/HG_PF/"+query["id"]
         f = open(filepath,"w")
         json.dump(ans,f)
