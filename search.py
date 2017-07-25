@@ -166,79 +166,79 @@ def query_parse(query):  # input query - json
     return parsed_dic
 
 
-def query_body_build(parsed_query):
-    """
-    Build the query body for elasticsearch
-    :param parsed_query: Dictionary
-    :return: query body: Dictionary
-    """
-    must_list = []
-    should_list = []
-    must_search_dic = parsed_query["must_search_field"]
-    should_search_dic = parsed_query["should_search_field"]
-    answer_field = parsed_query["answer_field"]
-    for condition in must_search_dic:
-        if condition == "phone" and not re.findall("\D",must_search_dic["phone"]):
-            must_list.append(must_search_dic[condition][:3])
-            must_list.append(must_search_dic[condition][3:6])
-            must_list.append(must_search_dic[condition][6:])
-            should_list.append(must_search_dic[condition][:3]+"-"+must_search_dic[condition][3:6]+"-"+must_search_dic[condition][6:])
-            should_list.append("("+must_search_dic[condition][:3]+")"+must_search_dic[condition][3:6]+"-"+must_search_dic[condition][6:])
-        elif condition == "posting_date":
-            calendar = must_search_dic[condition].split("-")
-            if len(calendar) == 3: #year,month,day are all included
-                must_list.append(calendar[0])
-                must_list.append(calendar[2])
-            elif len(calendar) == 2:
-                must_list.append(calendar[1])
-        elif condition == "eye_color":
-            must_list.append("eye")
-        elif condition == "hair_color":
-            must_list.append("hair")
-        elif condition == "ethnicity":
-            should_list.append("ethnicity")
-        elif condition == "nationality":
-            should_list.append("nationality")
-        else:
-            must_list.append(must_search_dic[condition])
+# def query_body_build(parsed_query):
+#     """
+#     Build the query body for elasticsearch
+#     :param parsed_query: Dictionary
+#     :return: query body: Dictionary
+#     """
+#     must_list = []
+#     should_list = []
+#     must_search_dic = parsed_query["must_search_field"]
+#     should_search_dic = parsed_query["should_search_field"]
+#     answer_field = parsed_query["answer_field"]
+#     for condition in must_search_dic:
+#         if condition == "phone" and not re.findall("\D",must_search_dic["phone"]):
+#             must_list.append(must_search_dic[condition][:3])
+#             must_list.append(must_search_dic[condition][3:6])
+#             must_list.append(must_search_dic[condition][6:])
+#             should_list.append(must_search_dic[condition][:3]+"-"+must_search_dic[condition][3:6]+"-"+must_search_dic[condition][6:])
+#             should_list.append("("+must_search_dic[condition][:3]+")"+must_search_dic[condition][3:6]+"-"+must_search_dic[condition][6:])
+#         elif condition == "posting_date":
+#             calendar = must_search_dic[condition].split("-")
+#             if len(calendar) == 3: #year,month,day are all included
+#                 must_list.append(calendar[0])
+#                 must_list.append(calendar[2])
+#             elif len(calendar) == 2:
+#                 must_list.append(calendar[1])
+#         elif condition == "eye_color":
+#             must_list.append("eye")
+#         elif condition == "hair_color":
+#             must_list.append("hair")
+#         elif condition == "ethnicity":
+#             should_list.append("ethnicity")
+#         elif condition == "nationality":
+#             should_list.append("nationality")
+#         else:
+#             must_list.append(must_search_dic[condition])
+#
+#     for condition in should_search_dic:
+#         should_list.append(should_search_dic[condition])
+#
+#     feature_should_search_map = {"tattoos":"tattoo","name":"name","street_address":"address","age":"age","hair_color":"hair","eye_color":"eye","nationality":"nationality","ethnicity":"ethnicity","review_site_id":"review","email":"email","phone":"phone","location":"location","price":"","multiple_providers":"","social_media_id":"","services":"","height":"height","weight":"weight","post_date":"posted"}
+#     for field in answer_field:
+#         if feature_should_search_map[field]:
+#             should_list.append(feature_should_search_map[field])
+#
+#     should_arr = []
+#     must_str = " AND ".join(must_list)
+#     for word in should_list:
+#         query_dic = {}
+#         query_dic["match"] = {}
+#         query_dic["match"]["extracted_text"] = word
+#         should_arr.append(query_dic)
+#     size = 3000 #number of documents retrieved from elasticsearch
+#     body = {"size":size,"query":{"bool":{"must":{"match":{"extracted_text": must_str}}, "should": should_arr}}}
+#     return body
 
-    for condition in should_search_dic:
-        should_list.append(should_search_dic[condition])
-
-    feature_should_search_map = {"tattoos":"tattoo","name":"name","street_address":"address","age":"age","hair_color":"hair","eye_color":"eye","nationality":"nationality","ethnicity":"ethnicity","review_site_id":"review","email":"email","phone":"phone","location":"location","price":"","multiple_providers":"","social_media_id":"","services":"","height":"height","weight":"weight","post_date":"posted"}
-    for field in answer_field:
-        if feature_should_search_map[field]:
-            should_list.append(feature_should_search_map[field])
-
-    should_arr = []
-    must_str = " AND ".join(must_list)
-    for word in should_list:
-        query_dic = {}
-        query_dic["match"] = {}
-        query_dic["match"]["extracted_text"] = word
-        should_arr.append(query_dic)
-    size = 3000 #number of documents retrieved from elasticsearch
-    body = {"size":size,"query":{"bool":{"must":{"match":{"extracted_text": must_str}}, "should": should_arr}}}
-    return body
-
-def elastic_search(query_body,username = "",password = ""):
-    """
-    :param query_body: Dictionary
-    :param username: String
-    :param password: String
-    :return:
-    """
-    es = Elasticsearch(
-         ["https://memexproxy.com/es/dig-nov-eval-hg-01/"],
-         http_auth=(username, password),
-         port=9200,
-         use_ssl=True,
-         verify_certs = True,
-         ca_certs=certifi.where(),
-    )
-    response = es.search(body=query_body,request_timeout=60)
-    documents = response["hits"]["hits"]
-    return documents
+# def elastic_search(query_body,username = "",password = ""):
+#     """
+#     :param query_body: Dictionary
+#     :param username: String
+#     :param password: String
+#     :return:
+#     """
+#     es = Elasticsearch(
+#          ["https://memexproxy.com/es/dig-nov-eval-hg-01/"],
+#          http_auth=(username, password),
+#          port=9200,
+#          use_ssl=True,
+#          verify_certs = True,
+#          ca_certs=certifi.where(),
+#     )
+#     response = es.search(body=query_body,request_timeout=60)
+#     documents = response["hits"]["hits"]
+#     return documents
 
 def annotation(text,query_id):
     """
@@ -257,4 +257,4 @@ def annotation(text,query_id):
 
 if __name__ == "__main__":
     query = {"type": "Point Fact", "question": "What is the country of birth listed in the ad that contains the phone number 6135019502, in Toronto Ontario, with the title 'the millionaires mistress'?", "id": "192", "SPARQL": ["PREFIX qpr: <http://istresearch.com/qpr>\nSELECT ?ad ?ethnicity\nWHERE\n{\t?ad a qpr:Ad ;\n\tqpr:phone '6135019502' ;\n\tqpr:location 'Toronto, Ontario' ;\n\tqpr:title ?title .\n\tFILTER CONTAINS(LCASE(?title), 'the millionaires mistress')\n}"]}
-    print(query_body_build(query_parse(query)))
+    print(query_parse(query))
