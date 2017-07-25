@@ -126,12 +126,13 @@ def generate_formal_answer(query,result):
             score = item[document_id]["validation_score"]
             candidates.append((document_id,score))
         candidates.sort(key = lambda k:k[1],reverse = True)
-        threhold = 0.5
-        thr_res = filter(lambda k:k[1]>threhold,candidates)
-        if len(thr_res) == 0 and candidates:
-            final_result["answers"] = candidates[:len(candidates)/2+1]
-        else:
-            final_result["answers"] = filter(lambda k:k[1]>threhold,candidates)
+        # threhold = 0.5
+        # thr_res = filter(lambda k:k[1]>threhold,candidates)
+        # if len(thr_res) == 0 and candidates:
+        #     final_result["answers"] = candidates[:len(candidates)/2+1]
+        # else:
+        #     final_result["answers"] = filter(lambda k:k[1]>threhold,candidates)
+        final_result["answers"] = candidates[:len(candidates)]
     elif query["type"] == "Cluster Facet":
         for item in result:
             document_id = item.keys()[0]
@@ -140,12 +141,14 @@ def generate_formal_answer(query,result):
                 score = (1-ans[1])*item[document_id]["validation_score"]
                 candidates.append((answer_text,document_id,score))
         candidates.sort(key = lambda k:k[2],reverse = True)
-        threhold = 0.5
-        thr_res = filter(lambda k:k[2]>threhold,candidates)
-        if len(thr_res) == 0 and candidates:
-            final_result["answers"] = candidates[:len(candidates)/2+1]
-        else:
-            final_result["answers"] = filter(lambda k:k[2]>threhold,candidates)
+        # threhold = 0.5
+        # thr_res = filter(lambda k:k[2]>threhold,candidates)
+        # if len(thr_res) == 0 and candidates:
+        #     final_result["answers"] = candidates[:len(candidates)/2+1]
+        #     final_result["answers"] = candidates[:len(candidates) / 2 + 1]
+        # else:
+        #     final_result["answers"] = filter(lambda k:k[2]>threhold,candidates)
+        final_result["answers"] = candidates[:len(candidates)]
     elif query["type"] == "Point Fact":
         #print(result)
         for item in result: #Currently pick the most relavant answer in each document
@@ -155,12 +158,13 @@ def generate_formal_answer(query,result):
                 score  = (1-item["answer"][0][1])*item["validation_score"]
                 candidates.append((answer_text,document_id,score))
         candidates.sort(key = lambda k:k[2],reverse = True)
-        threhold = 0.5
-        thr_res = filter(lambda k:k[2]>threhold,candidates)
-        if len(thr_res) == 0 and candidates:
-            final_result["answers"] = candidates[:len(candidates)/2+1]
-        else:
-            final_result["answers"] = filter(lambda k:k[2]>threhold,candidates)
+        # threhold = 0.5
+        # thr_res = filter(lambda k:k[2]>threhold,candidates)
+        # if len(thr_res) == 0 and candidates:
+        #     final_result["answers"] = candidates[:len(candidates)/2+1]
+        # else:
+        #     final_result["answers"] = filter(lambda k:k[2]>threhold,candidates)
+        final_result["answers"] = candidates[:len(candidates)]
     else:
         if not result:
             final_result["answers"] = []
@@ -172,54 +176,55 @@ def generate_formal_answer(query,result):
                 score  = (1-item["answer"][0][1])*item["validation_score"]
                 candidates.append((answer_text,document_id,score))
         candidates.sort(key = lambda k:k[2],reverse = True)
-        type_value = []
-        threhold = 0.5
-        if "price" in parsed_query_dic["answer_field"]:
-            for i in range(len(candidates)):
-                price_text = candidates[i][0]
-                prices = re.findall("\d+",price_text)
-                priceCounter = collections.Counter(prices)
-                most_common_price = int(max(priceCounter,key=priceCounter.get))
-                candidates[i] = (candidates[i][0],candidates[i][1],candidates[i][2],most_common_price)
-        if query["type"] == "MODE":
-            value_counter = collections.Counter()
-            if "price" in parsed_query_dic["answer_field"]:
-                value_counter = collections.Counter(k[3] for k in candidates)
-            else:
-                value_counter = collections.Counter(k[0] for k in candidates)
-            if parsed_query_dic["group"]["order_by"] == "DESC":
-                value_list = value_counter.items()
-                value_list.sort(key = lambda k:k[1],reverse = True)
-                type_value = value_list[:parsed_query_dic["group"]["limit"]]
-                if "price" in parsed_query_dic["answer_field"]:
-                    final_result["answers"] = type_value+map(lambda k:(k[0],k[1],k[2]),filter(lambda k:k[2]>threhold,candidates))
-                else:
-                    final_result["answers"] = type_value+filter(lambda k:k[2]>threhold,candidates)
-            else:
-                value_list = value_counter
-                value_list.sort(key = lambda k:k[1],reverse = True)
-                type_value = value_list[:parsed_query_dic["group"]["limit"]]
-                if "price" in parsed_query_dic["answer_field"]:
-                    final_result["answers"] = type_value+map(lambda k:(k[0],k[1],k[2]),filter(lambda k:k[2]>threhold,candidates))
-                else:
-                    final_result["answers"] = type_value+filter(lambda k:k[2]>threhold,candidates)
-        else:
-            if "price" in parsed_query_dic["answer_field"]:
-                candidates.sort(key = lambda k:k[3], reverse = True)
-            else:
-                candidates.sort(key = lambda k:k[0], reverse = True)
-            threhold = 0.5
-            if type == "MIN":
-                type_value = candidates[0][0]
-            elif type == "MAX":
-                type_value = candidates[-1][0]
-            elif type == "AVG":
-                if "price" in parsed_query_dic["answer_field"]:
-                    type_value = sum(k[3] for k in candidates)/len(candidates)
-                else:
-                    type_value = sum(k[0] for k in candidates)/len(candidates)
-            candidates.sort(key = lambda k:k[2],reverse = True)
-            final_result["answers"] = type_value+ map(lambda k:(k[0],k[1],k[2]),filter(lambda k:k[2]>threhold,candidates))
+        final_result["answers"] = candidates[:len(candidates)]
+        # type_value = []
+        # threhold = 0.5
+        # if "price" in parsed_query_dic["answer_field"]:
+        #     for i in range(len(candidates)):
+        #         price_text = candidates[i][0]
+        #         prices = re.findall("\d+",price_text)
+        #         priceCounter = collections.Counter(prices)
+        #         most_common_price = int(max(priceCounter,key=priceCounter.get))
+        #         candidates[i] = (candidates[i][0],candidates[i][1],candidates[i][2],most_common_price)
+        # if query["type"] == "MODE":
+        #     value_counter = collections.Counter()
+        #     if "price" in parsed_query_dic["answer_field"]:
+        #         value_counter = collections.Counter(k[3] for k in candidates)
+        #     else:
+        #         value_counter = collections.Counter(k[0] for k in candidates)
+        #     if parsed_query_dic["group"]["order_by"] == "DESC":
+        #         value_list = value_counter.items()
+        #         value_list.sort(key = lambda k:k[1],reverse = True)
+        #         type_value = value_list[:parsed_query_dic["group"]["limit"]]
+        #         if "price" in parsed_query_dic["answer_field"]:
+        #             final_result["answers"] = type_value+map(lambda k:(k[0],k[1],k[2]),filter(lambda k:k[2]>threhold,candidates))
+        #         else:
+        #             final_result["answers"] = type_value+filter(lambda k:k[2]>threhold,candidates)
+        #     else:
+        #         value_list = value_counter
+        #         value_list.sort(key = lambda k:k[1],reverse = True)
+        #         type_value = value_list[:parsed_query_dic["group"]["limit"]]
+        #         if "price" in parsed_query_dic["answer_field"]:
+        #             final_result["answers"] = type_value+map(lambda k:(k[0],k[1],k[2]),filter(lambda k:k[2]>threhold,candidates))
+        #         else:
+        #             final_result["answers"] = type_value+filter(lambda k:k[2]>threhold,candidates)
+        # else:
+        #     if "price" in parsed_query_dic["answer_field"]:
+        #         candidates.sort(key = lambda k:k[3], reverse = True)
+        #     else:
+        #         candidates.sort(key = lambda k:k[0], reverse = True)
+        #     threhold = 0.5
+        #     if type == "MIN":
+        #         type_value = candidates[0][0]
+        #     elif type == "MAX":
+        #         type_value = candidates[-1][0]
+        #     elif type == "AVG":
+        #         if "price" in parsed_query_dic["answer_field"]:
+        #             type_value = sum(k[3] for k in candidates)/len(candidates)
+        #         else:
+        #             type_value = sum(k[0] for k in candidates)/len(candidates)
+        #     candidates.sort(key = lambda k:k[2],reverse = True)
+        #     final_result["answers"] = type_value+ map(lambda k:(k[0],k[1],k[2]),filter(lambda k:k[2]>threhold,candidates))
     return final_result
 
 
