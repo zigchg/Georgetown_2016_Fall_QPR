@@ -860,7 +860,7 @@ def height_recognition(document,is_raw_content,is_position):
 	if type(result[0]) == int:
     	    result = filter(lambda x:x<220,result)
         else:
-	    result = filter(lambda x:x[1]<220,result)
+	        result = filter(lambda x:x[1]<220,result)
     return result
 
 def weight_recognition(document,is_raw_content,is_position):
