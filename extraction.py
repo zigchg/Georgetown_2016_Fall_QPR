@@ -1249,7 +1249,7 @@ if __name__ != "__main__":
     normalized_color = ["blonde", "brown", "black", "red", "auburn", "chestnut", "gray", "white","dark", "blue", "brown", "green", "hazel", "amber"]
     global color_list
     color_dic = webcolors.CSS3_NAMES_TO_HEX.keys()
-    color_list = color_dic
+    color_list = list(color_dic)
     for color in normalized_color:
         if color not in color_dic:
             color_list.append(color)
