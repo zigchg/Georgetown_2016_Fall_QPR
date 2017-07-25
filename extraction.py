@@ -857,8 +857,8 @@ def height_recognition(document,is_raw_content,is_position):
             result.append(int(item))
     #print(result)
     if result:
-	if type(result[0]) == int:
-    	    result = filter(lambda x:x<220,result)
+        if type(result[0]) == int:
+            result = filter(lambda x:x<220,result)
         else:
 	        result = filter(lambda x:x[1]<220,result)
     return result
