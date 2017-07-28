@@ -409,19 +409,38 @@ def validate(document, parsed_query,restricted): # Need to write
     else:
         return False
 
-if __name__ == "__main__":
+def rank_the_list(query, documents):
+    """
+    :param query: contains field of type, question, and id
+    :param documents: document objects containing docID, extracted text, and raw content
+    :return:
+    """
+
     reload(sys)
     sys.setdefaultencoding("utf-8")
-    query_path = "post_point_fact.json"
-    answer_path = "answer.json"
-    doc_path = "documents.json"
-    documents = []
-    query_list = search.query_retrival(query_path)
-    for query in query_list:
-        ans = pipeline(query,documents,True)
-        if len(ans["answers"]) == 0:
-            ans = pipeline(query,documents,False)
-        filepath = "HG/HG_PF/"+query["id"]
-        f = open(filepath,"w")
-        json.dump(ans,f)
-        f.close()
+    # raw content might be from ground truth dataset
+    # after raw text is retrieved
+    ans = pipeline(query,documents,True)
+    if len(ans["answers"])==0:
+        ans=pipeline(query,documents,False)
+    filepath = "HG/HG_PF/"+query["id"]
+    f = open(filepath,"w")
+    json.dump(ans,f)
+    f.close()
+
+# if __name__ == "__main__":
+#     reload(sys)
+#     sys.setdefaultencoding("utf-8")
+#     query_path = "post_point_fact.json"
+#     answer_path = "answer.json"
+#     doc_path = "documents.json"
+#     documents = []
+#     query_list = search.query_retrival(query_path)
+#     for query in query_list:
+#         ans = pipeline(query,documents,True)
+#         if len(ans["answers"]) == 0:
+#             ans = pipeline(query,documents,False)
+#         filepath = "HG/HG_PF/"+query["id"]
+#         f = open(filepath,"w")
+#         json.dump(ans,f)
+#         f.close()
