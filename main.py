@@ -415,7 +415,7 @@ def rank_the_list(query, documents):
     :param documents: document objects containing docID, extracted text, and raw content
     :return:
     """
-
+    # documents = response["hits"]["hits"]
     reload(sys)
     sys.setdefaultencoding("utf-8")
     # raw content might be from ground truth dataset
